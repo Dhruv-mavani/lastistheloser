@@ -25,6 +25,11 @@ const lobbyCountdown = document.getElementById('lobby-countdown');
 const leaveRoomBtn = document.getElementById('leave-room-btn');
 const startGameBtn = document.getElementById('start-game-btn');
 
+// Overlay Elements
+const howToPlayBtn = document.getElementById('how-to-play-btn');
+const howToPlayOverlay = document.getElementById('how-to-play-overlay');
+const closeHowToBtn = document.getElementById('close-how-to-btn');
+
 // Game Elements
 const hudLevel = document.getElementById('hud-level');
 const hudAlive = document.getElementById('hud-alive');
@@ -98,6 +103,21 @@ startGameBtn.addEventListener('click', () => {
 
 sendChatBtn.addEventListener('click', sendChat);
 chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChat(); });
+
+// Menu & Overlay Handlers
+howToPlayBtn.addEventListener('click', () => howToPlayOverlay.classList.remove('hidden'));
+closeHowToBtn.addEventListener('click', () => howToPlayOverlay.classList.add('hidden'));
+
+// Mobile touch support for main buttons
+[playNowBtn, createRoomBtn, joinRoomBtn, howToPlayBtn].forEach(btn => {
+    btn.addEventListener('touchend', (e) => {
+        // Only trigger if it wasn't a scroll/drag
+        if (e.cancelable) {
+            e.preventDefault();
+            btn.click();
+        }
+    }, { passive: false });
+});
 
 function sendChat() {
     const msg = chatInput.value.trim();
