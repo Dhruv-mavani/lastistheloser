@@ -1,0 +1,758 @@
+:root {
+    --bg-color: #0f0f0f;
+    --primary-accent: #00ff9c;
+    --secondary-accent: #7a5cff;
+    --text-color: #ffffff;
+    --error-color: #ff3b3b;
+    --font-title: 'Orbitron', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-body);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    max-width: 500px;
+    /* Mobile first constrained width for desktop */
+    position: relative;
+    overflow: hidden;
+}
+
+.screen {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.screen.active {
+    display: flex;
+}
+
+h1 {
+    font-family: var(--font-title);
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    color: var(--primary-accent);
+    text-shadow: 0 0 10px var(--primary-accent);
+}
+
+.subtitle {
+    font-style: italic;
+    font-size: 1rem;
+    margin-bottom: 3rem;
+    opacity: 0.8;
+}
+
+.input-group {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--secondary-accent);
+    padding: 1rem;
+    color: white;
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 15px rgba(0, 255, 156, 0.3);
+}
+
+.button-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.row {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+.btn {
+    padding: 1.2rem;
+    font-family: var(--font-title);
+    font-weight: bold;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+}
+
+.btn.primary {
+    background-color: var(--primary-accent);
+    color: var(--bg-color);
+    width: 100%;
+}
+
+.btn.secondary {
+    background-color: var(--secondary-accent);
+    color: white;
+    flex: 1;
+}
+
+.btn.outline {
+    background: transparent;
+    border: 2px solid var(--text-color);
+    color: var(--text-color);
+    width: 100%;
+    opacity: 0.6;
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.join-area {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.join-area input {
+    flex: 1;
+    margin-bottom: 0;
+    font-size: 1rem;
+    padding: 0.8rem;
+}
+
+.join-btn {
+    flex: 1.5;
+    opacity: 1 !important;
+}
+
+/* Glassmorphism & HUD Polish */
+.game-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 10;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.hud-item {
+    font-family: var(--font-title);
+    font-size: 0.8rem;
+    color: var(--text-color);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hud-item .label {
+    opacity: 0.5;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hud-timer {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    margin: 0 1rem;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+#hud-timer-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+    box-shadow: 0 0 15px var(--primary-accent);
+    transition: width 0.05s linear;
+}
+
+/* HUD Alive Animations */
+@keyframes hudGlow {
+    0% {
+        filter: drop-shadow(0 0 2px var(--primary-accent));
+    }
+
+    50% {
+        filter: drop-shadow(0 0 8px var(--primary-accent));
+    }
+
+    100% {
+        filter: drop-shadow(0 0 2px var(--primary-accent));
+    }
+}
+
+.hud-timer.urgent #hud-timer-bar {
+    background: var(--error-color);
+    box-shadow: 0 0 20px var(--error-color);
+    animation: urgentPulse 0.5s infinite;
+}
+
+@keyframes urgentPulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Animations */
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-2px, 2px);
+    }
+
+    40% {
+        transform: translate(-2px, -2px);
+    }
+
+    60% {
+        transform: translate(2px, 2px);
+    }
+
+    80% {
+        transform: translate(2px, -2px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
+}
+
+.glitch {
+    position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+}
+
+.glitch::before {
+    color: #0ff;
+    z-index: -1;
+    animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+}
+
+.glitch::after {
+    color: #f0f;
+    z-index: -2;
+    animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) reverse both infinite;
+}
+
+/* Lobby Styles */
+.player-list {
+    width: 100%;
+    margin: 2rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.player-item {
+    background: rgba(122, 92, 255, 0.2);
+    border: 1px solid var(--secondary-accent);
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.countdown {
+    font-size: 2rem;
+    color: var(--primary-accent);
+    margin-top: 2rem;
+    text-shadow: 0 0 10px var(--primary-accent);
+}
+
+/* Challenge Styles */
+.large-challenge-btn {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    box-shadow: 0 0 30px rgba(0, 255, 156, 0.5);
+    margin: 0 auto;
+}
+
+.color-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.color-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    transition: transform 0.1s ease;
+    margin: 0 auto;
+}
+
+.color-circle:active {
+    transform: scale(0.9);
+}
+
+.red {
+    background: #ff3b3b;
+}
+
+.blue {
+    background: #3b82f6;
+}
+
+.green {
+    background: #10b981;
+}
+
+.yellow {
+    background: #fbbf24;
+}
+
+.type-challenge-input {
+    margin-top: 2rem;
+    width: 100%;
+    text-transform: uppercase;
+}
+
+.moving-target {
+    position: absolute;
+    padding: 0.8rem 1.5rem;
+    background: var(--primary-accent);
+    color: var(--bg-color);
+    font-family: var(--font-title);
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Result Styles */
+.ragebait {
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--secondary-accent);
+    margin: 1.5rem 0;
+}
+
+.leaderboard {
+    width: 100%;
+    margin-bottom: 2rem;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+}
+
+.result-item.eliminated {
+    color: var(--error-color);
+    text-decoration: line-through;
+}
+
+.error-text {
+    color: var(--error-color);
+}
+
+.primary-text {
+    color: var(--primary-accent);
+}
+
+.trap-btn {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 400px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    .color-circle {
+        width: 80px;
+        height: 80px;
+    }
+
+    .large-challenge-btn {
+        width: 150px;
+        height: 150px;
+        font-size: 1.2rem;
+    }
+}
+
+/* HUD Styles */
+.game-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+    z-index: 10;
+}
+
+.hud-item {
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.hud-item .label {
+    opacity: 0.6;
+    font-size: 0.7rem;
+    display: block;
+}
+
+.hud-timer {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0 1.5rem;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+#hud-timer-bar {
+    height: 100%;
+    width: 100%;
+    background: var(--primary-accent);
+    box-shadow: 0 0 10px var(--primary-accent);
+    transition: width 0.1s linear;
+}
+
+/* Lobby Layout */
+.lobby-main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.player-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.8rem;
+    width: 100%;
+}
+
+.player-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--secondary-accent);
+    padding: 0.8rem 0.5rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: var(--font-title);
+    font-size: 0.7rem;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+
+.player-card.is-me {
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 10px rgba(0, 255, 156, 0.2);
+}
+
+.player-card .avatar {
+    font-size: 1.5rem;
+}
+
+.player-card .name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+/* Chat Styles */
+.chat-container {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    height: 250px;
+    width: 100%;
+    margin-top: auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+    font-size: 0.85rem;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: var(--secondary-accent);
+    border-radius: 10px;
+}
+
+.chat-msg {
+    animation: slideIn 0.2s ease;
+    word-break: break-word;
+}
+
+.chat-msg .sender {
+    color: var(--primary-accent);
+    font-weight: bold;
+    margin-right: 0.5rem;
+    font-family: var(--font-title);
+    font-size: 0.75rem;
+}
+
+.chat-msg .text {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.chat-msg.system {
+    color: var(--secondary-accent);
+    font-style: italic;
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.chat-input-area {
+    display: flex;
+    padding: 0.8rem;
+    gap: 0.6rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chat-input-area input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+    color: white;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.chat-input-area input:focus {
+    border-color: var(--primary-accent);
+}
+
+.small-btn {
+    padding: 0.6rem 1rem !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap;
+    width: auto !important;
+    /* Fix overlapping button */
+}
+
+/* Status & Footer */
+.lobby-footer {
+    width: 100%;
+    padding: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Utilities */
+.green-text {
+    color: var(--primary-accent);
+}
+
+.accent-text {
+    color: var(--secondary-accent);
+}
+
+.lobby-hud {
+    margin-bottom: 1rem;
+}
+
+.challenge-instruction {
+    margin-bottom: 1rem;
+}
+
+#prep-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    z-index: 20;
+}
+
+#prep-overlay h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    letter-spacing: 4px;
+}
+
+#prep-countdown {
+    font-size: 5rem;
+    text-shadow: 0 0 20px var(--secondary-accent);
+}
+.me-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--primary-accent);
+    color: var(--bg-color);
+    font-size: 0.5rem;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-weight: bold;
+    box-shadow: 0 0 5px var(--primary-accent);
+}
