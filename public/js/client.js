@@ -35,11 +35,10 @@ const prepCountdown = document.getElementById('prep-countdown');
 
 // Sounds
 const sounds = {
-    aayein: document.getElementById('sound-aayein'),
-    moye: document.getElementById('sound-moye'),
-    maza: document.getElementById('sound-maza'),
-    systum: document.getElementById('sound-systum'),
-    fahh: document.getElementById('sound-fahh')
+    lobby: document.getElementById('sound-lobby'),
+    timeout: document.getElementById('sound-timeout'),
+    eliminated: document.getElementById('sound-eliminated'),
+    survived: document.getElementById('sound-survived')
 };
 
 function playSound(name) {
@@ -154,7 +153,7 @@ socket.on('lobbyCountdown', (data) => {
         lobbyStatus.classList.remove('hidden');
         return;
     }
-    if (data.count === 5) playSound('maza'); // "Abhi maza aayega" on start countdown
+    if (data.count === 5) playSound('lobby'); // "Chaloo" on start countdown
     lobbyStatus.classList.add('hidden');
     lobbyTimerContainer.classList.remove('hidden');
     lobbyCountdown.innerText = data.count;
@@ -195,9 +194,9 @@ socket.on('roundResult', (data) => {
 
     const isEliminated = (data.eliminated === currentNickname);
     if (isEliminated) {
-        playSound('moye'); // "Moye Moye" on loss
+        playSound('eliminated'); // "teri-gand-mari" on loss (only for eliminated)
     } else {
-        playSound('systum'); // "Systum" on surviving
+        playSound('survived'); // "wow-kya-ladka-hai" on surviving (only for survivors)
     }
 
     screens.result.innerHTML = `
@@ -219,7 +218,7 @@ socket.on('roundResult', (data) => {
 
 socket.on('gameOver', (data) => {
     showScreen('result');
-    if (data.winner === currentNickname) playSound('systum');
+    playSound('survived'); // "wow-kya-ladka-hai" (Global on gameOver)
 
     screens.result.innerHTML = `
         <h1 class="font-title green-text">MATCH OVER</h1>
@@ -280,12 +279,11 @@ function startHUDTimer(limit) {
 
         if (remaining < 0.3) {
             hudTimerBar.parentElement.classList.add('urgent');
-            if (remaining > 0.28) playSound('fahh'); // Play fahh once when urgent starts
         }
 
         if (remaining === 0) {
             clearInterval(timerInterval);
-            playSound('aayein'); // "Aayein" on timeout
+            playSound('timeout'); // "chicken-on-tree-screaming" on timeout
         }
     }, 50);
 }
