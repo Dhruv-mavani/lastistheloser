@@ -15,7 +15,7 @@ class RoomManager {
             status: 'LOBBY',
             gameLogic: null,
             maxPlayers: 10,
-            minPlayers: 3,
+            minPlayers: 2,
             hostId: null,
             countdown: null
         };
