@@ -105,18 +105,23 @@ sendChatBtn.addEventListener('click', sendChat);
 chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChat(); });
 
 // Menu & Overlay Handlers
-howToPlayBtn.addEventListener('click', () => howToPlayOverlay.classList.remove('hidden'));
-closeHowToBtn.addEventListener('click', () => howToPlayOverlay.classList.add('hidden'));
+if (howToPlayBtn && howToPlayOverlay) {
+    howToPlayBtn.addEventListener('click', () => howToPlayOverlay.classList.remove('hidden'));
+}
+if (closeHowToBtn && howToPlayOverlay) {
+    closeHowToBtn.addEventListener('click', () => howToPlayOverlay.classList.add('hidden'));
+}
 
-// Mobile touch support for main buttons
+// Mobile touch support - more compatible approach
 [playNowBtn, createRoomBtn, joinRoomBtn, howToPlayBtn].forEach(btn => {
-    btn.addEventListener('touchend', (e) => {
-        // Only trigger if it wasn't a scroll/drag
-        if (e.cancelable) {
-            e.preventDefault();
-            btn.click();
-        }
-    }, { passive: false });
+    if (btn) {
+        btn.addEventListener('touchstart', () => {
+            btn.style.opacity = '0.7';
+        });
+        btn.addEventListener('touchend', () => {
+            btn.style.opacity = '1';
+        });
+    }
 });
 
 function sendChat() {
