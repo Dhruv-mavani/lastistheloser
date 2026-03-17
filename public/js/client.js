@@ -48,9 +48,31 @@ const sounds = {
 
 function playSound(name) {
     if (sounds[name]) {
+        // Reset and play
+        sounds[name].pause();
         sounds[name].currentTime = 0;
-        sounds[name].play().catch(e => console.log('Audio error:', e));
+        const playPromise = sounds[name].play();
+        if (playPromise !== undefined) {
+            playPromise.catch(e => console.log('Audio error:', e));
+        }
     }
+}
+
+let audioUnlocked = false;
+function unlockAudio() {
+    if (audioUnlocked) return;
+    Object.values(sounds).forEach(audio => {
+        if (audio) {
+            audio.muted = true;
+            audio.play().then(() => {
+                audio.pause();
+                audio.muted = false;
+                audio.currentTime = 0;
+            }).catch(e => console.log('Unlock error:', e));
+        }
+    });
+    audioUnlocked = true;
+    console.log('Audio Context Unlocked');
 }
 
 let currentNickname = '';
@@ -73,6 +95,7 @@ function showScreen(screenName) {
 
 // Event Listeners
 playNowBtn.addEventListener('click', () => {
+    unlockAudio();
     const nick = nicknameInput.value.trim();
     if (!nick) {
         alert('PLEASE ENTER A NICKNAME FIRST!');
@@ -84,6 +107,7 @@ playNowBtn.addEventListener('click', () => {
 });
 
 createRoomBtn.addEventListener('click', () => {
+    unlockAudio();
     const nick = nicknameInput.value.trim();
     if (!nick) {
         alert('PLEASE ENTER A NICKNAME FIRST!');
@@ -95,6 +119,7 @@ createRoomBtn.addEventListener('click', () => {
 });
 
 joinRoomBtn.addEventListener('click', () => {
+    unlockAudio();
     const nick = nicknameInput.value.trim();
     if (!nick) {
         alert('PLEASE ENTER A NICKNAME FIRST!');
@@ -112,20 +137,33 @@ joinRoomBtn.addEventListener('click', () => {
 });
 
 leaveRoomBtn.addEventListener('click', () => {
+    unlockAudio();
     socket.emit('leaveRoom');
     showScreen('landing');
 });
 
 startGameBtn.addEventListener('click', () => {
+    unlockAudio();
     socket.emit('startGame');
 });
 
-sendChatBtn.addEventListener('click', sendChat);
-chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChat(); });
+sendChatBtn.addEventListener('click', () => {
+    unlockAudio();
+    sendChat();
+});
+chatInput.addEventListener('keypress', (e) => { 
+    if (e.key === 'Enter') {
+        unlockAudio();
+        sendChat(); 
+    }
+});
 
 // Menu & Overlay Handlers
 if (howToPlayBtn) {
-    howToPlayBtn.addEventListener('click', () => window.location.href = 'howtoplay.html');
+    howToPlayBtn.addEventListener('click', () => {
+        unlockAudio();
+        window.location.href = 'howtoplay.html';
+    });
 }
 if (closeHowToBtn && howToPlayOverlay) {
     closeHowToBtn.addEventListener('click', () => howToPlayOverlay.classList.add('hidden'));
@@ -242,10 +280,9 @@ socket.on('roundResult', (data) => {
 
     const isEliminated = (data.eliminated === currentNickname);
     if (isEliminated) {
-        playSound('eliminated'); // "teri-gand-mari" on loss (only for eliminated)
-    } else {
-        playSound('survived'); // "wow-kya-ladka-hai" on surviving (only for survivors)
+        playSound('eliminated'); // "teri-gand-mari" ONLY on loss
     }
+    // Survivors hear nothing as per user request
 
     screens.result.innerHTML = `
         <h2 class="font-title ${isEliminated ? 'error-text' : ''}">
@@ -267,7 +304,10 @@ socket.on('roundResult', (data) => {
 socket.on('gameOver', (data) => {
     currentRoom = data.room; // Sync room state for rematch
     showScreen('result');
-    playSound('survived'); // "wow-kya-ladka-hai" (Global on gameOver)
+    
+    if (data.winner === currentNickname) {
+        playSound('survived'); // "wow-kya-ladka-hai" ONLY for winner
+    }
 
     screens.result.innerHTML = `
         <h1 class="font-title green-text">MATCH OVER</h1>
