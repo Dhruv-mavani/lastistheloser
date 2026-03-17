@@ -74,6 +74,7 @@ class RoomManager {
             this.io.to(room.id).emit('lobbyCountdown', { count });
             if (count <= 0) {
                 clearInterval(room.countdown);
+                room.countdown = null;
                 room.gameLogic = new GameLogic(this.io, room);
                 room.gameLogic.start();
             }

@@ -179,7 +179,14 @@ class GameLogic {
         const winner = this.activePlayers.length === 1 ? this.activePlayers[0].nickname : "NO ONE (DRAW)";
         this.io.to(this.room.id).emit('gameOver', {
             winner,
-            rounds: this.currentRound
+            rounds: this.currentRound,
+            room: {
+                id: this.room.id,
+                players: [...this.activePlayers, ...this.spectators],
+                status: 'LOBBY',
+                hostId: this.room.hostId,
+                minPlayers: this.room.minPlayers
+            }
         });
 
         // Reset for rematch

@@ -73,23 +73,42 @@ function showScreen(screenName) {
 
 // Event Listeners
 playNowBtn.addEventListener('click', () => {
-    currentNickname = nicknameInput.value.trim() || 'Anonymous' + Math.floor(Math.random() * 1000);
+    const nick = nicknameInput.value.trim();
+    if (!nick) {
+        alert('PLEASE ENTER A NICKNAME FIRST!');
+        nicknameInput.focus();
+        return;
+    }
+    currentNickname = nick;
     socket.emit('quickMatch', { nickname: currentNickname });
 });
 
 createRoomBtn.addEventListener('click', () => {
-    currentNickname = nicknameInput.value.trim() || 'Anonymous';
+    const nick = nicknameInput.value.trim();
+    if (!nick) {
+        alert('PLEASE ENTER A NICKNAME FIRST!');
+        nicknameInput.focus();
+        return;
+    }
+    currentNickname = nick;
     socket.emit('createRoom', { nickname: currentNickname });
 });
 
 joinRoomBtn.addEventListener('click', () => {
-    currentNickname = nicknameInput.value.trim() || 'Anonymous';
-    const roomCode = roomCodeInput.value.trim().toUpperCase();
-    if (roomCode) {
-        socket.emit('joinRoom', { nickname: currentNickname, roomId: roomCode });
-    } else {
-        alert('PLEASE ENTER ROOM CODE!');
+    const nick = nicknameInput.value.trim();
+    if (!nick) {
+        alert('PLEASE ENTER A NICKNAME FIRST!');
+        nicknameInput.focus();
+        return;
     }
+    const roomCode = roomCodeInput.value.trim().toUpperCase();
+    if (!roomCode) {
+        alert('PLEASE ENTER A 4-LETTER ROOM CODE!');
+        roomCodeInput.focus();
+        return;
+    }
+    currentNickname = nick;
+    socket.emit('joinRoom', { nickname: currentNickname, roomId: roomCode });
 });
 
 leaveRoomBtn.addEventListener('click', () => {
@@ -141,6 +160,10 @@ function addSystemMessage(text) {
 }
 
 // Socket Handlers
+socket.on('error', (msg) => {
+    alert('ERROR: ' + msg.toUpperCase());
+});
+
 socket.on('roomJoined', (data) => {
     currentRoom = data.room;
     roomCodeDisplay.innerText = data.room.id;
@@ -242,6 +265,7 @@ socket.on('roundResult', (data) => {
 });
 
 socket.on('gameOver', (data) => {
+    currentRoom = data.room; // Sync room state for rematch
     showScreen('result');
     playSound('survived'); // "wow-kya-ladka-hai" (Global on gameOver)
 
