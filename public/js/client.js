@@ -94,6 +94,7 @@ function showScreen(screenName) {
 }
 
 // Event Listeners
+/*
 playNowBtn.addEventListener('click', () => {
     unlockAudio();
     const nick = nicknameInput.value.trim();
@@ -105,6 +106,7 @@ playNowBtn.addEventListener('click', () => {
     currentNickname = nick;
     socket.emit('quickMatch', { nickname: currentNickname });
 });
+*/
 
 createRoomBtn.addEventListener('click', () => {
     unlockAudio();
@@ -170,7 +172,7 @@ if (closeHowToBtn && howToPlayOverlay) {
 }
 
 // Mobile touch support - more compatible approach
-[playNowBtn, createRoomBtn, joinRoomBtn, howToPlayBtn].forEach(btn => {
+[createRoomBtn, joinRoomBtn, howToPlayBtn].forEach(btn => {
     if (btn) {
         btn.addEventListener('touchstart', () => {
             btn.style.opacity = '0.7';
