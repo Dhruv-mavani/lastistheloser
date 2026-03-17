@@ -105,8 +105,8 @@ sendChatBtn.addEventListener('click', sendChat);
 chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChat(); });
 
 // Menu & Overlay Handlers
-if (howToPlayBtn && howToPlayOverlay) {
-    howToPlayBtn.addEventListener('click', () => howToPlayOverlay.classList.remove('hidden'));
+if (howToPlayBtn) {
+    howToPlayBtn.addEventListener('click', () => window.location.href = 'howtoplay.html');
 }
 if (closeHowToBtn && howToPlayOverlay) {
     closeHowToBtn.addEventListener('click', () => howToPlayOverlay.classList.add('hidden'));
