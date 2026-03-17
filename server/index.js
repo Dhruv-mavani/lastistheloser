@@ -10,9 +10,14 @@ const server = http.createServer(app);
 const io = new Server(server);
 const roomManager = new RoomManager(io);
 
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT) || 3000;
 
 app.use(express.static(path.join(__dirname, '../public')));
+
+// Health check for Render
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
 
 // Basic Socket.io connection handling
 io.on('connection', (socket) => {
@@ -95,6 +100,12 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+    console.log('====================================');
+    console.log(`SERVER STARTING...`);
+    console.log(`PORT: ${PORT}`);
+    console.log(`NODE_VERSION: ${process.version}`);
+    console.log(`ENV: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`DIRECTORY: ${__dirname}`);
+    console.log('====================================');
 });
